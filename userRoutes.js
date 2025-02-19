@@ -4,6 +4,9 @@ const { upload } = require("../services/uploadService");
 const User = require("../model/User");
 
 const router = express.Router();
+const { getProfile } = require("../controllers/userController");
+router.get("/profile/:id", getProfile); // Profile fetch route
+
 
 router.post("/register", upload.single("profilePic"), async (req, res) => {
     try {
