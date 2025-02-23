@@ -1,12 +1,12 @@
 const express = require("express");
-const { createUser, updateUser, deleteUser, login } = require("../controllers/userController");
+const { createUser, updateUser, getAllUsers,deleteUser, login } = require("../controllers/userController");
 const { upload } = require("../services/uploadService"); 
 const User = require("../model/User");
 
 const router = express.Router();
 const { getProfile } = require("../controllers/userController");
 router.get("/profile/:id", getProfile); // Profile fetch route
-
+router.get("/all", getAllUsers); // Fetch all users route
 
 router.post("/register", upload.single("profilePic"), async (req, res) => {
     try {
