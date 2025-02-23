@@ -135,5 +135,22 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Fetch all users
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ["id", "full_name", "email", "dob", "bio", "profilePic"],
+    });
+
+    res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+// Export the new function
+module.exports = { createUser, getProfile, updateUser, deleteUser, login, getAllUsers };
+
+
 // Export all functions
-module.exports = { createUser, getProfile, updateUser, deleteUser, login };
