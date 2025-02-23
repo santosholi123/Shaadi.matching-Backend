@@ -1,64 +1,56 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const bcrypt = require('bcrypt');
-
-// Initialize Sequelize
-const sequelize = new Sequelize('register', 'postgres', '230558', {
-    host: 'localhost',
-    dialect: 'postgres',
-    logging: false, // Disable SQL query logging in the console
-});
+const { DataTypes } = require("sequelize");
+const sequelize = require("../db"); // Import existing Sequelize instance
+const bcrypt = require("bcrypt");
 
 // Define the User model
-const User = sequelize.define('User', {
+const User = sequelize.define(
+  "User",
+  {
     full_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true, // Validates email format
-        },
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true, // Ensures email format validation
+      },
     },
     password: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-}, {
-    tableName: 'users', // Specify the table name
-    timestamps: true, // Add createdAt and updatedAt fields
-});
+    dob: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    profilePic: {
+      type: DataTypes.STRING, // Store image URL/path
+      allowNull: true,
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "users", // Explicitly set table name
+    timestamps: false, // Disable createdAt and updatedAt fields
+  }
+);
 
-// Hash the password before saving a user
+// Hash password before creating a user
 User.beforeCreate(async (user) => {
-    if (user.password) {
-        user.password = await bcrypt.hash(user.password, 10);
-    }
+  user.password = await bcrypt.hash(user.password, 10);
 });
 
-// Hash the password before updating a user (if password is modified)
+// Hash password before updating (if password is changed)
 User.beforeUpdate(async (user) => {
-    if (user.password && user.changed('password')) {
-        user.password = await bcrypt.hash(user.password, 10);
-    }
+  if (user.changed("password")) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
 });
 
-// Sync the model with the database (creates the table if it doesn't exist)
-const initializeDatabase = async () => {
-    try {
-        await sequelize.authenticate(); // Test the database connection
-        console.log('Connection to the database established successfully.');
-        await sequelize.sync({ alter: true }); // Sync models with database
-        console.log('Database synced.');
-    } catch (error) {
-        console.error('Unable to connect to the database:', error);
-    }
-};
-
-// Initialize the database connection
-initializeDatabase();
-
-// Export the User model
 module.exports = User;
