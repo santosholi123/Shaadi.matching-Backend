@@ -22,6 +22,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    phoneNumber:{
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     dob: {
       type: DataTypes.DATEONLY,
       allowNull: false,
@@ -41,16 +45,8 @@ const User = sequelize.define(
   }
 );
 
-// Hash password before creating a user
-User.beforeCreate(async (user) => {
-  user.password = await bcrypt.hash(user.password, 10);
-});
 
-// Hash password before updating (if password is changed)
-User.beforeUpdate(async (user) => {
-  if (user.changed("password")) {
-    user.password = await bcrypt.hash(user.password, 10);
-  }
-});
+
+
 
 module.exports = User;
