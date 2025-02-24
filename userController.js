@@ -30,11 +30,14 @@ const login = async (req, res) => {
     }
 };
 
-// Create a new user (Register)
 const createUser = async (req, res) => {
   try {
-    const { full_name, email, password, confirmPassword, dob, bio, profilePic } = req.body;
-    console.log("Received registration data:", { full_name, email });
+    const { full_name, email, password, confirmPassword, phoneNumber, dob, bio } = req.body;
+    
+    // Use req.protocol to dynamically construct the full URL for the profile picture
+    const profilePic = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;
+
+    console.log("Received registration data:", { full_name, email, profilePic });
 
     // Check if passwords match
     if (password !== confirmPassword) {
@@ -52,7 +55,16 @@ const createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the user
-    const newUser = await User.create({ full_name, email, password: hashedPassword, dob, bio, profilePic });
+    const newUser = await User.create({ 
+      full_name, 
+      email, 
+      password: hashedPassword,
+      phoneNumber, 
+      dob, 
+      bio, 
+      profilePic 
+    });
+
     console.log("User created successfully:", newUser.email);
 
     res.status(201).json({ message: "User registered successfully.", user: newUser });
@@ -69,7 +81,7 @@ const getProfile = async (req, res) => {
 
     // Find user by ID
     const user = await User.findByPk(id, {
-      attributes: ["id", "full_name", "email", "dob", "bio", "profilePic"],
+      attributes: ["id", "full_name", "email", "phoneNumber","dob", "bio", "profilePic"],
     });
 
     if (!user) {
@@ -87,7 +99,7 @@ const getProfile = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { full_name, email, password, dob, bio, profilePic } = req.body;
+    const { full_name, email, password, phoneNumber,dob, bio, profilePic } = req.body;
 
     // Find the user
     const user = await User.findByPk(id);
@@ -103,6 +115,7 @@ const updateUser = async (req, res) => {
     // Update user details
     user.full_name = full_name || user.full_name;
     user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
     user.dob = dob || user.dob;
     user.bio = bio || user.bio;
     user.profilePic = profilePic || user.profilePic;
@@ -139,7 +152,7 @@ const deleteUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ["id", "full_name", "email", "dob", "bio", "profilePic"],
+      attributes: ["id", "full_name", "email", "dob","phoneNumber", "bio", "profilePic"],
     });
 
     res.json(users);
