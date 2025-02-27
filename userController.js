@@ -95,13 +95,14 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Update user profile
+
+// Update user profile controller
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { full_name, email, password, phoneNumber,dob, bio, profilePic } = req.body;
-
-    // Find the user
+    const { full_name, email, password, phoneNumber, dob, bio } = req.body;
+    console.log("Received update data:", { full_name, email, phoneNumber, dob, bio });
+    // Check if the user exists
     const user = await User.findByPk(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -112,14 +113,19 @@ const updateUser = async (req, res) => {
       user.password = await bcrypt.hash(password, 10);
     }
 
-    // Update user details
+    // Update other user details
     user.full_name = full_name || user.full_name;
     user.email = email || user.email;
     user.phoneNumber = phoneNumber || user.phoneNumber;
     user.dob = dob || user.dob;
     user.bio = bio || user.bio;
-    user.profilePic = profilePic || user.profilePic;
 
+    // Handle profile picture if uploaded
+    if (req.file) {
+      user.profilePic = req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : null;// Store the path of the uploaded file
+    }
+
+    // Save updated user information to the database
     await user.save();
 
     res.json({ message: "Profile updated successfully.", user });
@@ -128,6 +134,9 @@ const updateUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+
 
 // Delete user account
 const deleteUser = async (req, res) => {
