@@ -22,7 +22,7 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    phoneNumber:{
+    phoneNumber: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -38,15 +38,16 @@ const User = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    roleId: {
+      type: DataTypes.INTEGER, // Foreign key reference to "Roles" table
+      allowNull: false,
+      defaultValue: 1, // Default role (1 = Regular User, 2 = Admin, etc.)
+    },
   },
   {
     tableName: "users", // Explicitly set table name
     timestamps: false, // Disable createdAt and updatedAt fields
   }
 );
-
-
-
-
 
 module.exports = User;
