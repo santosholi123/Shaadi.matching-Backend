@@ -12,7 +12,7 @@ router.post("/register", upload.single("profilePic"), createUser);
   
 
 router.post("/signup", createUser);
-router.put("/:id", updateUser);
+router.put("/update/:id",upload.single("profilePic") ,updateUser);
 router.delete("/:id", deleteUser);
 router.post("/login", login);
 
