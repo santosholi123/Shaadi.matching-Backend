@@ -1,11 +1,19 @@
 const express = require("express");
-const userController = require("../controllers/userController");
+const { createUser, updateUser, getAllUsers,deleteUser, login } = require("../controllers/userController");
+const { upload } = require("../services/uploadService"); 
+const User = require("../model/User");
 
 const router = express.Router();
+const { getProfile } = require("../controllers/userController");
+router.get("/profile/:id", getProfile); // Profile fetch route
+router.get("/all", getAllUsers); // Fetch all users route
 
-// Signup Route
-router.post("/signup", userController.createUser);
-router.put("/:id", userController.updateUser);
-router.delete("/:id", userController.deleteUser);
+router.post("/register", upload.single("profilePic"), createUser);
+  
+
+router.post("/signup", createUser);
+router.put("/update/:id",upload.single("profilePic") ,updateUser);
+router.delete("/:id", deleteUser);
+router.post("/login", login);
 
 module.exports = router;
